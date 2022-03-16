@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo '🏗️👷 Linting, testing and building your project before committing'
+
+echo '🏗️👷 Running linting'
+yarn lint
+
+echo '🏗️👷 Running tests'
+yarn test 
+
+# If everything passes... Now we can commit
+echo '✅✅✅✅ You win this time... I am committing this now. ✅✅✅✅'
