@@ -5,6 +5,9 @@ import { StatusModule } from './status/status.module';
 import { PublisherModule } from './publisher/publisher.module';
 import { AppLoggerModule } from './logger/logger.module';
 import { HttpLoggerMiddleware } from './common/middleware';
+import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtGuard } from './auth/guard';
 
 @Module({
   imports: [
@@ -17,6 +20,13 @@ import { HttpLoggerMiddleware } from './common/middleware';
     }),
     StatusModule,
     PublisherModule,
+    AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
   ],
 })
 export class AppModule implements NestModule {

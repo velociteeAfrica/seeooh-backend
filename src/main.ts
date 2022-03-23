@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -8,6 +9,11 @@ async function bootstrap() {
     bufferLogs: true,
   });
   app.useLogger(app.get(AppLoggerService));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
   const config = new DocumentBuilder()
     .setTitle('Seeooh API Docs')
     .setDescription('The Seeooh API documentation')
