@@ -3,16 +3,34 @@ import { Document } from 'mongoose';
 
 export type PublisherDocument = Publisher & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Publisher {
-  @Prop()
-  name: string;
+  @Prop({ lowercase: true, required: true, trim: true })
+  firstName: string;
 
-  @Prop()
-  age: number;
+  @Prop({ lowercase: true, required: true, trim: true })
+  lastName: string;
 
-  @Prop()
-  breed: string;
+  @Prop({ lowercase: true, required: true, trim: true, unique: true })
+  companyEmail: string;
+
+  @Prop({ lowercase: true, required: true, trim: true })
+  companyName: string;
+
+  @Prop({ lowercase: true, required: true, trim: true })
+  companyPhone: string;
+
+  @Prop({ lowercase: true, required: true, trim: true })
+  jobTitle: string;
+
+  @Prop({ required: true })
+  password: string;
+
+  @Prop({ required: true })
+  publisherUuid: string;
+
+  @Prop({ default: '' })
+  refreshTokenHash: string;
 }
 
 export const PublisherSchema = SchemaFactory.createForClass(Publisher);
