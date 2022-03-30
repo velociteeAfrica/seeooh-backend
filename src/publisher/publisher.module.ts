@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Publisher, PublisherSchema } from './schema/publisher.schema';
 import { PublisherController } from './publisher.controller';
 import { PublisherService } from './publisher.service';
+import { PublisherInventoryModule } from 'src/publisher-inventory/publisher-inventory.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { PublisherService } from './publisher.service';
       [{ name: Publisher.name, schema: PublisherSchema }],
       'publishers',
     ),
+    PublisherInventoryModule,
   ],
   controllers: [PublisherController],
   providers: [PublisherService],
