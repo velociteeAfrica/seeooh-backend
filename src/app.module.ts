@@ -8,6 +8,7 @@ import { HttpLoggerMiddleware } from './common/middleware';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guard';
+import { PublisherInventoryModule } from './publisher-inventory/publisher-inventory.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { JwtGuard } from './auth/guard';
     StatusModule,
     PublisherModule,
     AuthModule,
+    PublisherInventoryModule,
   ],
   providers: [
     {
