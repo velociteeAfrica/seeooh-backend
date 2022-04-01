@@ -5,6 +5,8 @@ import { Publisher, PublisherSchema } from '../publisher/schema';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AccessTokenStrategy, RefreshTokenStrategy } from './strategy';
+import { PendingPublisherModule } from '../pending-publisher/pending-publisher.module';
+import { PublisherModule } from '../publisher/publisher.module';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { AccessTokenStrategy, RefreshTokenStrategy } from './strategy';
       'publishers',
     ),
     JwtModule.register({}),
+    PublisherModule,
+    PendingPublisherModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
