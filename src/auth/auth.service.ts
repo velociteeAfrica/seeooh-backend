@@ -25,14 +25,14 @@ export class AuthService {
       })
       .select(['-refreshTokenHash']);
     if (!publisher) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException('Invalid Credentials');
     }
     const isValidPassword = await argon.verify(
       publisher.password,
       dto.password,
     );
     if (!isValidPassword) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException('Invalid Credentials');
     }
     const tokens = await this.signTokens(publisher.id, publisher.companyEmail);
     await this.updateRtHash(publisher.id, tokens.refreshToken);
@@ -48,11 +48,21 @@ export class AuthService {
   async authPublisherSignup(
     dto: AuthPublisherSignupDto,
   ): Promise<AuthPublisher> {
-    const checkForExistingPublisher = await this.publisherModel.findOne({
-      companyEmail: dto.companyEmail,
-    });
-    if (checkForExistingPublisher) {
+    const checkForExistingPublisherViaEmail = await this.publisherModel.findOne(
+      {
+        companyEmail: dto.companyEmail,
+      },
+    );
+    if (checkForExistingPublisherViaEmail) {
       throw new ForbiddenException('Email already exists');
+    }
+    const checkForExistingPublisherViaCompanyName =
+      await this.publisherModel.findOne({
+        companyName: dto.companyName,
+      });
+
+    if (checkForExistingPublisherViaCompanyName) {
+      throw new ForbiddenException('Company name already exists');
     }
     const pwdHash = await argon.hash(dto.password);
     const newPublisher = await this.publisherModel.create({
