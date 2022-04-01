@@ -14,7 +14,7 @@ export class Publisher {
   @Prop({ lowercase: true, required: true, trim: true, unique: true })
   companyEmail: string;
 
-  @Prop({ lowercase: true, required: true, trim: true })
+  @Prop({ lowercase: true, required: true, trim: true, unique: true })
   companyName: string;
 
   @Prop({ lowercase: true, required: true, trim: true })
