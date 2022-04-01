@@ -8,7 +8,11 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetCurrentUser, GetCurrentUserId, Public } from './decorator';
-import { AuthPublisherLoginDto, AuthPublisherSignupDto } from './dto';
+import {
+  AuthActivatePendingPublisherDto,
+  AuthPublisherLoginDto,
+  AuthPublisherSignupDto,
+} from './dto';
 import { AuthToken } from './entities';
 import { AuthPublisher } from './entities/auth-publisher.entity';
 import { JwtRefreshGuard } from './guard';
@@ -31,8 +35,17 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async authPublisherSignup(
     @Body() dto: AuthPublisherSignupDto,
-  ): Promise<AuthPublisher> {
+  ): Promise<{ success: boolean }> {
     return this.authService.authPublisherSignup(dto);
+  }
+
+  @Public()
+  @Post('publisher/pending/activate')
+  @HttpCode(HttpStatus.CREATED)
+  async authActivatePendingPublisher(
+    @Body() dto: AuthActivatePendingPublisherDto,
+  ): Promise<{ success: boolean }> {
+    return this.authService.authActivatePendingPublisher(dto);
   }
 
   @Post('publisher/logout')

@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guard';
 import { PublisherInventoryModule } from './publisher-inventory/publisher-inventory.module';
+import { PendingPublisherModule } from './pending-publisher/pending-publisher.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PublisherInventoryModule } from './publisher-inventory/publisher-invent
     PublisherModule,
     AuthModule,
     PublisherInventoryModule,
+    PendingPublisherModule,
   ],
   providers: [
     {

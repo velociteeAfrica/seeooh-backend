@@ -15,5 +15,6 @@ import { PublisherInventoryModule } from 'src/publisher-inventory/publisher-inve
   ],
   controllers: [PublisherController],
   providers: [PublisherService],
+  exports: [PublisherService],
 })
 export class PublisherModule {}

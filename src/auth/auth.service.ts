@@ -3,18 +3,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
-import { v4 as uuidv4 } from 'uuid';
 import { Publisher, PublisherDocument } from '../publisher/schema';
-import { AuthPublisherLoginDto, AuthPublisherSignupDto } from './dto';
+import {
+  AuthActivatePendingPublisherDto,
+  AuthPublisherLoginDto,
+  AuthPublisherSignupDto,
+} from './dto';
 import { ConfigService } from '@nestjs/config';
 import { AuthToken } from './entities';
 import { AuthPublisher } from './entities/auth-publisher.entity';
+import { PendingPublisherService } from '../pending-publisher/pending-publisher.service';
+import { PublisherService } from '../publisher/publisher.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(Publisher.name)
     private publisherModel: Model<PublisherDocument>,
+    private publisherService: PublisherService,
+    private pendingPublisherService: PendingPublisherService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -47,7 +54,7 @@ export class AuthService {
   }
   async authPublisherSignup(
     dto: AuthPublisherSignupDto,
-  ): Promise<AuthPublisher> {
+  ): Promise<{ success: boolean }> {
     const checkForExistingPublisherViaEmail = await this.publisherModel.findOne(
       {
         companyEmail: dto.companyEmail,
@@ -65,28 +72,57 @@ export class AuthService {
       throw new ForbiddenException('Company name already exists');
     }
     const pwdHash = await argon.hash(dto.password);
-    const newPublisher = await this.publisherModel.create({
+    await this.pendingPublisherService.createPendingPublisher({
       ...dto,
       password: pwdHash,
-      publisherUuid: uuidv4(),
     });
-    //   .select(['-password', '-refreshTokenHash']);
-
-    const tokens = await this.signTokens(
-      newPublisher.id,
-      newPublisher.companyEmail,
-    );
-    await this.updateRtHash(newPublisher.id, tokens.refreshToken);
-    const publisherObject = {
-      ...newPublisher.toObject(),
-    };
-    delete publisherObject.password;
-    delete publisherObject.refreshTokenHash;
     return {
-      ...publisherObject,
-      ...tokens,
+      success: true,
     };
   }
+  async authActivatePendingPublisher(dto: AuthActivatePendingPublisherDto) {
+    const verifyPayload = await this.pendingPublisherService.verifyToken(
+      dto.token,
+    );
+    if (!verifyPayload) {
+      throw new ForbiddenException('Invalid Token');
+    }
+    if (verifyPayload.companyEmail !== dto.companyEmail) {
+      throw new ForbiddenException('Invalid Credentials');
+    }
+    const findPendingPublisher =
+      await this.pendingPublisherService.findSecurePendingPublisher(
+        verifyPayload.sub,
+      );
+    if (!findPendingPublisher) {
+      throw new ForbiddenException('Invalid Token');
+    }
+    const {
+      firstName,
+      lastName,
+      companyEmail,
+      companyName,
+      companyPhone,
+      jobTitle,
+      password,
+    } = findPendingPublisher.toObject();
+    await this.publisherService.createPublisher({
+      firstName,
+      lastName,
+      companyEmail,
+      companyName,
+      companyPhone,
+      jobTitle,
+      password,
+    });
+    await this.pendingPublisherService.deletePendingPublisher(
+      findPendingPublisher._id,
+    );
+    return {
+      success: true,
+    };
+  }
+
   async authPublisherLogout(
     publisherId: string,
   ): Promise<{ success: boolean }> {

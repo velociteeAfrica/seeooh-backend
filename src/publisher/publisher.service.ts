@@ -2,10 +2,12 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 import { AppLoggerService } from '../logger/logger.service';
 import { Publisher, PublisherDocument } from './schema';
 import { PublisherInventoryService } from 'src/publisher-inventory/publisher-inventory.service';
-import { PublisherInventoryDto } from 'src/publisher-inventory/dto';
+import { PublisherInventoryDto } from '../publisher-inventory/dto';
+import { AuthPublisherSignupDto } from '../auth/dto';
 
 @Injectable()
 export class PublisherService {
@@ -25,6 +27,17 @@ export class PublisherService {
   }
   async findAll(): Promise<Publisher[]> {
     return this.publisherModel.find().exec();
+  }
+  async createPublisher(
+    dto: AuthPublisherSignupDto,
+  ): Promise<{ success: boolean }> {
+    await this.publisherModel.create({
+      ...dto,
+      publisherUuid: uuidv4(),
+    });
+    return {
+      success: true,
+    };
   }
   async getAllPublisherInventory(publisherId: string): Promise<any[]> {
     return await this.publisherInventoryService.getAllPublisherInventory(
