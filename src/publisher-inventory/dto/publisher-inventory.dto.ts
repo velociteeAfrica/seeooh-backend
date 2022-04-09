@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsString,
   IsUrl,
+  ValidateIf,
 } from 'class-validator';
 
 export class PublisherInventoryDto {
@@ -48,12 +49,12 @@ export class PublisherInventoryDto {
   inventoryStatus: string;
 
   @IsIn([
-    'northcentral',
-    'northeast',
-    'northwest',
-    'southeast',
-    'southsouth',
-    'southwest',
+    'north central',
+    'north east',
+    'north west',
+    'south east',
+    'south south',
+    'south west',
   ])
   inventoryRegion: string;
 
@@ -84,6 +85,7 @@ export class PublisherInventoryDto {
   @IsNumber()
   inventoryUnit: number;
 
+  @ValidateIf((o) => o.inventoryImage !== '')
   @IsUrl()
   inventoryImage: string;
 }
