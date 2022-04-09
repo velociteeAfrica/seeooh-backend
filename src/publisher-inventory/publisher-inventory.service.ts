@@ -9,12 +9,12 @@ import { PublisherInventory, PublisherInventoryDocument } from './schema';
 export class PublisherInventoryService {
   constructor(
     @InjectModel(PublisherInventory.name)
-    private publisherModel: Model<PublisherInventoryDocument>,
+    private publisherInventoryModel: Model<PublisherInventoryDocument>,
   ) {}
   async getAllPublisherInventory(
     publisherId: string,
-  ): Promise<PublisherInventory[]> {
-    return await this.publisherModel
+  ): Promise<PublisherInventoryDocument[]> {
+    return await this.publisherInventoryModel
       .find({ publisher: publisherId })
       .select(['-inventoryUuid', '-__v']);
   }
@@ -22,7 +22,7 @@ export class PublisherInventoryService {
     publisherId: string,
     dto: PublisherInventoryDto,
   ): Promise<PublisherInventory> {
-    const newPublisherInventory = await this.publisherModel.create({
+    const newPublisherInventory = await this.publisherInventoryModel.create({
       ...dto,
       publisher: publisherId,
       inventoryUuid: uuidv4(),
@@ -37,7 +37,7 @@ export class PublisherInventoryService {
     inventoryId: string,
     dto: PublisherInventoryDto,
   ): Promise<PublisherInventory> {
-    const updatedPublisherInventory = await this.publisherModel
+    const updatedPublisherInventory = await this.publisherInventoryModel
       .findOneAndUpdate(
         {
           publisher: publisherId,
@@ -53,7 +53,7 @@ export class PublisherInventoryService {
     publisherId: string,
     inventoryId: string,
   ): Promise<{ success: boolean }> {
-    await this.publisherModel.findOneAndDelete({
+    await this.publisherInventoryModel.findOneAndDelete({
       publisher: publisherId,
       _id: inventoryId,
     });

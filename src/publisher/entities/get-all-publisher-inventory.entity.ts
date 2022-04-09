@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PublisherInventoryEntity } from '../../publisher-inventory/entities';
+import { PublisherInventoryDocument } from 'src/publisher-inventory/schema';
+// import { PublisherInventoryEntity } from '../../publisher-inventory/entities';
 
 export class GetAllPublisherInventoryResponse {
   @ApiProperty({
     isArray: true,
   })
-  result: PublisherInventoryEntity;
+  result: PublisherInventoryDocument[];
 
   @ApiProperty({
     properties: {
@@ -17,5 +18,6 @@ export class GetAllPublisherInventoryResponse {
   })
   metadata: {
     count: number;
+    lastUpdated: Date;
   };
 }
