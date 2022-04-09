@@ -66,9 +66,6 @@ export class PendingPublisherService {
   }
   async signToken(pendingPublisherId: string, email: string): Promise<string> {
     const payload = { sub: pendingPublisherId, companyEmail: email };
-    this.jwt.verifyAsync('dds', {
-      secret: this.config.get('JWT_SECRET'),
-    });
     const token = await this.jwt.signAsync(payload, {
       expiresIn: this.config.get('PENDING_PUBLISHER_JWT_SECRET_EXPIRES_IN'),
       secret: this.config.get('PENDING_PUBLISHER_JWT_SECRET'),

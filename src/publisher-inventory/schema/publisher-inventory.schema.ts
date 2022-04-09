@@ -2,11 +2,12 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Publisher } from '../../publisher/schema';
 
-export type PublisherInventoryDocument = PublisherInventory & mongoose.Document;
+export type PublisherInventoryDocument = PublisherInventory &
+  mongoose.Document & { updatedAt: Date; createdAt: Date };
 
 @Schema({ timestamps: true })
 export class PublisherInventory {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Publisher' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Publisher.name })
   publisher: Publisher;
 
   @Prop({ lowercase: true, required: true, trim: true })
@@ -31,7 +32,6 @@ export class PublisherInventory {
     lowercase: true,
     required: true,
     trim: true,
-    unique: true,
   })
   inventoryClass: string;
 
@@ -63,12 +63,12 @@ export class PublisherInventory {
 
   @Prop({
     enum: [
-      'northcentral',
-      'northeast',
-      'northwest',
-      'southeast',
-      'southsouth',
-      'southwest',
+      'north central',
+      'north east',
+      'north west',
+      'south east',
+      'south south',
+      'south west',
     ],
     lowercase: true,
     required: true,
@@ -79,10 +79,10 @@ export class PublisherInventory {
   @Prop({ lowercase: true, required: true, trim: true })
   inventoryState: string;
 
-  @Prop({ lowercase: true, required: true, trim: true })
+  @Prop({ required: true, trim: true })
   inventoryLga: string;
 
-  @Prop({ lowercase: true, required: true, trim: true })
+  @Prop({ required: true, trim: true })
   inventoryCity: string;
 
   @Prop({ required: true, trim: true })
@@ -100,7 +100,7 @@ export class PublisherInventory {
   @Prop({ required: true })
   inventoryUnit: number;
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   inventoryImage: string;
 
   @Prop({ required: true })

@@ -9,7 +9,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'https://publisher.seeooh.app'],
   });
   app.useLogger(app.get(AppLoggerService));
   app.useGlobalPipes(

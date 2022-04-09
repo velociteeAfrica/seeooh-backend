@@ -5,7 +5,7 @@ export class PublisherInventoryEntity {
     description: 'the id of the inventory',
     example: '4fc67871349bb7bf6a000002',
   })
-  _id: string;
+  _id?: string;
 
   @ApiProperty({
     description: 'the id of the inventory publisher',
