@@ -10,7 +10,6 @@ import {
   AuthPublisherSignupDto,
 } from './dto';
 import { ConfigService } from '@nestjs/config';
-import { AuthToken } from './entities';
 import { AuthPublisher } from './entities/auth-publisher.entity';
 import { PendingPublisherService } from '../pending-publisher/pending-publisher.service';
 import { PublisherService } from '../publisher/publisher.service';
@@ -30,7 +29,7 @@ export class AuthService {
       .findOne({
         companyEmail: dto.companyEmail,
       })
-      .select(['-refreshTokenHash']);
+      .select(['-accessTokenHash']);
     if (!publisher) {
       throw new ForbiddenException('Invalid Credentials');
     }
@@ -41,15 +40,17 @@ export class AuthService {
     if (!isValidPassword) {
       throw new ForbiddenException('Invalid Credentials');
     }
-    const tokens = await this.signTokens(publisher.id, publisher.companyEmail);
-    await this.updateRtHash(publisher.id, tokens.refreshToken);
+    const token = await this.signToken(publisher.id, publisher.companyEmail);
+    await this.updateAtHash(publisher.id, token);
     const publisherObject = {
       ...publisher.toObject(),
     };
     delete publisherObject.password;
     return {
       ...publisherObject,
-      ...tokens,
+      token: {
+        accessToken: token,
+      },
     };
   }
   async authPublisherSignup(
@@ -128,7 +129,7 @@ export class AuthService {
   ): Promise<{ success: boolean }> {
     await this.publisherModel.findByIdAndUpdate(publisherId, {
       $set: {
-        refreshTokenHash: '',
+        accessTokenHash: '',
       },
     });
     return {
@@ -136,65 +137,49 @@ export class AuthService {
     };
   }
 
-  async authPublisherRefreshTokens(
-    publisherId: string,
-    refreshToken: string,
-  ): Promise<AuthToken> {
+  async authPublisherSession(publisherId: string): Promise<AuthPublisher> {
     const publisher = await this.publisherModel.findById(publisherId);
-    if (!publisher || !publisher.refreshTokenHash) {
-      throw new ForbiddenException('Access denied');
+    if (!publisher) {
+      return null;
     }
-    const refreshTokenMatches = await argon.verify(
-      publisher.refreshTokenHash,
-      refreshToken,
-    );
-    if (!refreshTokenMatches) {
-      throw new ForbiddenException('Access denied');
-    }
-    const tokens = await this.signTokens(publisher.id, publisher.companyEmail);
-    await this.updateRtHash(publisher.id, tokens.refreshToken);
+    const token = await this.signToken(publisher._id, publisher.companyEmail);
+    await this.updateAtHash(publisher._id, token);
+    const publisherObject = {
+      ...publisher.toObject(),
+    };
+    delete publisherObject.password;
+    delete publisherObject.accessTokenHash;
     return {
-      ...tokens,
+      ...publisherObject,
+      token: {
+        accessToken: token,
+      },
     };
   }
-  async updateRtHash(publisherId: string, refreshToken: string) {
-    const hash = await argon.hash(refreshToken);
+
+  async updateAtHash(publisherId: string, accessToken: string) {
+    const hash = await argon.hash(accessToken);
     await this.publisherModel.findByIdAndUpdate(
       publisherId,
       {
-        refreshTokenHash: hash,
+        accessTokenHash: hash,
       },
       {
         new: true,
       },
     );
   }
-  async signTokens(sub: string, publisherEmail: string): Promise<AuthToken> {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(
-        {
-          sub,
-          publisherEmail,
-        },
-        {
-          expiresIn: this.configService.get('ACCESS_TOKEN_EXPIRES_IN'),
-          secret: this.configService.get('ACCESS_TOKEN_SECRET'),
-        },
-      ),
-      this.jwtService.signAsync(
-        {
-          sub,
-          publisherEmail,
-        },
-        {
-          expiresIn: this.configService.get('REFRESH_TOKEN_EXPIRES_IN'),
-          secret: this.configService.get('REFRESH_TOKEN_SECRET'),
-        },
-      ),
-    ]);
-    return {
-      accessToken,
-      refreshToken,
-    };
+  async signToken(sub: string, publisherEmail: string): Promise<string> {
+    const token = await this.jwtService.signAsync(
+      {
+        sub,
+        publisherEmail,
+      },
+      {
+        expiresIn: this.configService.get('ACCESS_TOKEN_EXPIRES_IN'),
+        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+      },
+    );
+    return token;
   }
 }

@@ -20,6 +20,9 @@ export class Publisher {
   @Prop({ lowercase: true, required: true, trim: true })
   companyPhone: string;
 
+  @Prop({ default: '' })
+  companyLogo: string;
+
   @Prop({ lowercase: true, required: true, trim: true })
   jobTitle: string;
 
@@ -30,7 +33,7 @@ export class Publisher {
   publisherUuid: string;
 
   @Prop({ default: '' })
-  refreshTokenHash: string;
+  accessTokenHash: string;
 }
 
 export const PublisherSchema = SchemaFactory.createForClass(Publisher);
