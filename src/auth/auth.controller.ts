@@ -1,21 +1,12 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { GetCurrentUser, GetCurrentUserId, Public } from './decorator';
+import { GetCurrentUserId, Public } from './decorator';
 import {
   AuthActivatePendingPublisherDto,
   AuthPublisherLoginDto,
   AuthPublisherSignupDto,
 } from './dto';
-import { AuthToken } from './entities';
 import { AuthPublisher } from './entities/auth-publisher.entity';
-import { JwtRefreshGuard } from './guard';
 
 @Controller('auth')
 export class AuthController {
@@ -54,16 +45,11 @@ export class AuthController {
     return this.authService.authPublisherLogout(publisherId);
   }
 
-  @UseGuards(JwtRefreshGuard)
-  @Post('publisher/refresh')
+  @Post('publisher/session')
   @HttpCode(HttpStatus.OK)
-  async authPublisherRefreshTokens(
+  async authPublisherSession(
     @GetCurrentUserId() publisherId: string,
-    @GetCurrentUser('refreshToken') refreshToken: string,
-  ): Promise<AuthToken> {
-    return this.authService.authPublisherRefreshTokens(
-      publisherId,
-      refreshToken,
-    );
+  ): Promise<AuthPublisher> {
+    return this.authService.authPublisherSession(publisherId);
   }
 }
