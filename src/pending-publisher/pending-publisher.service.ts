@@ -31,7 +31,15 @@ export class PendingPublisherService {
     );
     return pendingPublisher;
   }
-
+  async findPendingPublisherByField(
+    field: string,
+    value: string,
+  ): Promise<PendingPublisherReturn> {
+    const pendingPublisher = await this.pendingPublisherModel.findOne({
+      [field]: value,
+    });
+    return pendingPublisher ? pendingPublisher.toResponseObject() : null;
+  }
   async createPendingPublisher(
     dto: PendingPublisherDto,
   ): Promise<PendingPublisherReturn> {
@@ -52,7 +60,7 @@ export class PendingPublisherService {
       newPendingPublisher._id,
       newPendingPublisher.companyEmail,
     );
-    newPendingPublisher.token = token;
+    newPendingPublisher.activationToken = token;
     await newPendingPublisher.save();
     return newPendingPublisher.toResponseObject();
   }

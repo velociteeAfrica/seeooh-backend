@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthPublisher } from './entities/auth-publisher.entity';
 import { PendingPublisherService } from '../pending-publisher/pending-publisher.service';
 import { PublisherService } from '../publisher/publisher.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,7 @@ export class AuthService {
     private pendingPublisherService: PendingPublisherService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly mailerService: MailerService,
   ) {}
   async authPublisherLogin(dto: AuthPublisherLoginDto): Promise<AuthPublisher> {
     const publisher = await this.publisherModel
@@ -61,6 +63,11 @@ export class AuthService {
         companyEmail: dto.companyEmail,
       },
     );
+    // const checkForExistingPendingPublisherViaEmail =
+    //   await this.pendingPublisherService.findPendingPublisherByField(
+    //     'companyEmail',
+    //     dto.companyEmail,
+    //   );
     if (checkForExistingPublisherViaEmail) {
       throw new ForbiddenException('Email already exists');
     }
@@ -68,14 +75,51 @@ export class AuthService {
       await this.publisherModel.findOne({
         companyName: dto.companyName,
       });
+    // const checkForExistingPendingPublisherViaCompanyName =
+    //   await this.pendingPublisherService.findPendingPublisherByField(
+    //     'companyName',
+    //     dto.companyName,
+    //   );
 
     if (checkForExistingPublisherViaCompanyName) {
       throw new ForbiddenException('Company name already exists');
     }
     const pwdHash = await argon.hash(dto.password);
-    await this.pendingPublisherService.createPendingPublisher({
-      ...dto,
-      password: pwdHash,
+    const pendingPublisher =
+      await this.pendingPublisherService.createPendingPublisher({
+        ...dto,
+        password: pwdHash,
+      });
+    await this.mailerService.sendMail({
+      to: 'support@seeooh.app', // list of receivers
+      from: 'Seeooh <support@seeooh.app>', // sender address
+      subject: 'New Publisher Sign Up Details/Activation', // Subject line
+      text: 'New entry to publisher.seeooh.app - publisher.seeooh.app ', // plaintext body
+      template: 'admin-publisher-signup-activation',
+      context: {
+        // Data to be sent to template engine.
+        companyName: dto.companyName,
+        jobTitle: dto.jobTitle,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        companyPhone: dto.companyPhone,
+        companyEmail: dto.companyEmail,
+        activationLink: `${this.configService.get(
+          'SERVER_BASE_URL',
+        )}auth/publisher/pending/activate?companyEmail=${
+          dto.companyEmail
+        }&token=${pendingPublisher.activationToken}`,
+      },
+    });
+    await this.mailerService.sendMail({
+      to: dto.companyEmail,
+      from: 'Seeooh <support@seeooh.app>',
+      subject: 'Publisher Sign Up response',
+      text: 'Signup to publisher.seeooh.app - publisher.seeooh.app ',
+      template: 'response-to-publisher-after-signup',
+      context: {
+        firstName: dto.firstName,
+      },
     });
     return {
       success: true,
@@ -119,6 +163,18 @@ export class AuthService {
     await this.pendingPublisherService.deletePendingPublisher(
       findPendingPublisher._id,
     );
+    await this.mailerService.sendMail({
+      to: companyEmail,
+      from: 'Seeooh <support@seeooh.app>',
+      subject: 'Publisher Account Activation response',
+      text: 'Login to publisher.seeooh.app - publisher.seeooh.app ',
+      template: 'response-to-publisher-after-activation',
+      context: {
+        firstName,
+        companyName,
+        clientLoginLink: `${this.configService.get('CLIENT_BASE_URL')}login`,
+      },
+    });
     return {
       success: true,
     };
@@ -178,6 +234,24 @@ export class AuthService {
       {
         expiresIn: this.configService.get('ACCESS_TOKEN_EXPIRES_IN'),
         secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+      },
+    );
+    return token;
+  }
+  async signupPublisherToken(
+    publisherEmail: string,
+    publisherName: string,
+  ): Promise<string> {
+    const token = await this.jwtService.signAsync(
+      {
+        sub: publisherEmail,
+        publisherName,
+      },
+      {
+        expiresIn: this.configService.get(
+          'SIGNUP_PUBLISHER_ACCESS_TOKEN_EXPIRES_IN',
+        ),
+        secret: this.configService.get('SIGNUP_PUBLISHER_ACCESS_TOKEN_SECRET'),
       },
     );
     return token;

@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetCurrentUserId, Public } from './decorator';
 import {
@@ -31,10 +39,10 @@ export class AuthController {
   }
 
   @Public()
-  @Post('publisher/pending/activate')
-  @HttpCode(HttpStatus.CREATED)
+  @Get('publisher/pending/activate')
+  @HttpCode(HttpStatus.OK)
   async authActivatePendingPublisher(
-    @Body() dto: AuthActivatePendingPublisherDto,
+    @Query() dto: AuthActivatePendingPublisherDto,
   ): Promise<{ success: boolean }> {
     return this.authService.authActivatePendingPublisher(dto);
   }

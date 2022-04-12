@@ -28,7 +28,7 @@ export class PendingPublisher {
   password: string;
 
   @Prop()
-  token: string;
+  activationToken: string;
 
   toResponseObject: () => PendingPublisherReturn;
 }
@@ -45,6 +45,7 @@ PendingPublisherSchema.methods.toResponseObject = function () {
     companyName,
     companyPhone,
     jobTitle,
+    activationToken,
     createdAt,
   } = this;
   return {
@@ -55,6 +56,7 @@ PendingPublisherSchema.methods.toResponseObject = function () {
     companyName,
     companyPhone,
     jobTitle,
+    activationToken,
     createdAt,
   };
 };
