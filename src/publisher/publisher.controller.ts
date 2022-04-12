@@ -30,7 +30,7 @@ export class PublisherController {
   async getAllPublisherInventory(
     @GetCurrentUserId() publisherId: string,
     @Param('id') id: string,
-  ): Promise<any> {
+  ): Promise<GetAllPublisherInventoryResponse> {
     if (id !== publisherId) {
       throw new ForbiddenException(
         'You are not allowed to access this resource',

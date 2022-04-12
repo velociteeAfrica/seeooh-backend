@@ -23,5 +23,8 @@ export class PendingPublisherReturn {
   jobTitle: string;
 
   @ApiProperty()
+  activationToken: string;
+
+  @ApiProperty()
   createdAt: Date;
 }

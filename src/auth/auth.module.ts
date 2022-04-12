@@ -7,6 +7,9 @@ import { AuthService } from './auth.service';
 import { AccessTokenStrategy, RefreshTokenStrategy } from './strategy';
 import { PendingPublisherModule } from '../pending-publisher/pending-publisher.module';
 import { PublisherModule } from '../publisher/publisher.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
   imports: [
@@ -14,6 +17,30 @@ import { PublisherModule } from '../publisher/publisher.module';
       [{ name: Publisher.name, schema: PublisherSchema }],
       'publishers',
     ),
+    MailerModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.get('MAIL_OUTGOING_SERVER'),
+          port: configService.get('MAIL_OUTGOING_PORT'),
+          secure: true,
+          auth: {
+            user: configService.get('MAIL_INCOMING_USERNAME'),
+            pass: configService.get('MAIL_INCOMING_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: 'Seeooh <support@seeooh.app>',
+        },
+        template: {
+          dir: process.cwd() + '/src/templates/',
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+      inject: [ConfigService],
+    }),
     JwtModule.register({}),
     PublisherModule,
     PendingPublisherModule,
