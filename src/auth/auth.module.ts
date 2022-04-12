@@ -27,6 +27,9 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
             user: configService.get('MAIL_INCOMING_USERNAME'),
             pass: configService.get('MAIL_INCOMING_PASSWORD'),
           },
+          tls: {
+            rejectUnauthorized: false,
+          },
         },
         defaults: {
           from: 'Seeooh <support@seeooh.app>',
