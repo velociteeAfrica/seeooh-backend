@@ -55,7 +55,7 @@ export class PublisherService {
           // Turn your strings into dates, and then subtract them
           // to get a value that is either negative, positive, or zero.
           return Number(new Date(b.updatedAt)) - Number(new Date(a.updatedAt));
-        })[0].updatedAt,
+        })[0]?.updatedAt,
       },
     };
   }

@@ -22,7 +22,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
         transport: {
           host: configService.get('MAIL_OUTGOING_SERVER'),
           port: configService.get('MAIL_OUTGOING_PORT'),
-          secure: true,
+          secure: false,
+          requireTLC: true,
           auth: {
             user: configService.get('MAIL_INCOMING_USERNAME'),
             pass: configService.get('MAIL_INCOMING_PASSWORD'),
