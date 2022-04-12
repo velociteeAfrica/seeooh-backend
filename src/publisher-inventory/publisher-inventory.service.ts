@@ -16,6 +16,7 @@ export class PublisherInventoryService {
   ): Promise<PublisherInventoryDocument[]> {
     return await this.publisherInventoryModel
       .find({ publisher: publisherId })
+      .sort({ createdAt: 1 })
       .select(['-inventoryUuid', '-__v']);
   }
   async createPublisherInventory(

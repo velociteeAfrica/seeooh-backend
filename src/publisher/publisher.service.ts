@@ -51,7 +51,7 @@ export class PublisherService {
       result: publisherInventories,
       metadata: {
         count: publisherInventories.length,
-        lastUpdated: publisherInventories.sort(function (a, b) {
+        lastUpdated: [...publisherInventories].sort(function (a, b) {
           // Turn your strings into dates, and then subtract them
           // to get a value that is either negative, positive, or zero.
           return Number(new Date(b.updatedAt)) - Number(new Date(a.updatedAt));
