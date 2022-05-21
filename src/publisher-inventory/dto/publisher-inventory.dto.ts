@@ -22,8 +22,8 @@ export class PublisherInventoryDto {
   ])
   inventoryCategory: string;
 
-  @IsIn(['digital', 'static'])
-  inventoryClass: string;
+  // @IsIn(['digital', 'static'])
+  // inventoryClass: string;
 
   @IsString()
   @IsNotEmpty()
@@ -66,12 +66,13 @@ export class PublisherInventoryDto {
   @IsNotEmpty()
   inventoryLga: string;
 
-  @IsString()
-  @IsNotEmpty()
-  inventoryCity: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // inventoryCity: string;
 
-  @IsLatLong()
-  inventoryCoordinate: string;
+  // @ValidateIf((o) => o.inventoryCoordinate !== '')
+  // @IsLatLong()
+  // inventoryCoordinate: string;
 
   @IsNumber()
   inventoryAmountAnnum: number;
