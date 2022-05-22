@@ -25,11 +25,11 @@ export class PublisherInventoryEntity {
   })
   inventoryCategory: string;
 
-  @ApiProperty({
-    description: 'the class of the inventory',
-    example: 'digital',
-  })
-  inventoryClass: string;
+  // @ApiProperty({
+  //   description: 'the class of the inventory',
+  //   example: 'digital',
+  // })
+  // inventoryClass: string;
 
   @ApiProperty({
     description: 'the inventory type',
@@ -91,17 +91,17 @@ export class PublisherInventoryEntity {
   })
   inventoryLga: string;
 
-  @ApiProperty({
-    description: 'the inventory city',
-    example: 'oregun',
-  })
-  inventoryCity: string;
+  // @ApiProperty({
+  //   description: 'the inventory city',
+  //   example: 'oregun',
+  // })
+  // inventoryCity: string;
 
-  @ApiProperty({
-    description: 'the inventory location coordinate',
-    example: '6.567, 3.567',
-  })
-  inventoryCoordinate: string;
+  // @ApiProperty({
+  //   description: 'the inventory location coordinate',
+  //   example: '6.567, 3.567',
+  // })
+  // inventoryCoordinate: string;
 
   @ApiProperty({
     description: 'the inventory amount per annum',
