@@ -27,13 +27,13 @@ export class PublisherInventory {
   })
   inventoryCategory: string;
 
-  // @Prop({
-  //   enum: ['digital', 'static'],
-  //   lowercase: true,
-  //   required: true,
-  //   trim: true,
-  // })
-  // inventoryClass: string;
+  @Prop({
+    enum: ['digital', 'static'],
+    lowercase: true,
+    required: true,
+    trim: true,
+  })
+  inventoryClass: string;
 
   @Prop({ lowercase: true, required: true, trim: true })
   inventoryType: string;
@@ -85,8 +85,8 @@ export class PublisherInventory {
   // @Prop({ required: true, trim: true })
   // inventoryCity: string;
 
-  // @Prop({ required: true, trim: true })
-  // inventoryCoordinate: string;
+  @Prop({ default: '' })
+  inventoryCoordinate: string;
 
   @Prop({ required: true })
   inventoryAmountAnnum: number;

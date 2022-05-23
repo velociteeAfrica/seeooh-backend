@@ -1,6 +1,5 @@
 import {
   IsIn,
-  IsLatLong,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -22,8 +21,8 @@ export class PublisherInventoryDto {
   ])
   inventoryCategory: string;
 
-  // @IsIn(['digital', 'static'])
-  // inventoryClass: string;
+  @IsIn(['digital', 'static'])
+  inventoryClass: string;
 
   @IsString()
   @IsNotEmpty()

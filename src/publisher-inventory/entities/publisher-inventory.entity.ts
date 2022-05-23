@@ -25,11 +25,11 @@ export class PublisherInventoryEntity {
   })
   inventoryCategory: string;
 
-  // @ApiProperty({
-  //   description: 'the class of the inventory',
-  //   example: 'digital',
-  // })
-  // inventoryClass: string;
+  @ApiProperty({
+    description: 'the class of the inventory',
+    example: 'digital',
+  })
+  inventoryClass: string;
 
   @ApiProperty({
     description: 'the inventory type',
