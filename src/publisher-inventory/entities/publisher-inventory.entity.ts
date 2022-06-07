@@ -2,19 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class PublisherInventoryEntity {
   @ApiProperty({
-    description: 'the id of the inventory',
+    description: 'id of the inventory',
     example: '4fc67871349bb7bf6a000002',
   })
   _id?: string;
 
   @ApiProperty({
-    description: 'the id of the inventory publisher',
+    description: 'id of the inventory publisher',
     example: '5gd78982351cc8cg7b156709',
   })
   publisher: string;
 
   @ApiProperty({
-    description: 'the name of the inventory',
+    description: 'name of the inventory',
     example: 'ALL005MO',
   })
   inventoryName: string;
